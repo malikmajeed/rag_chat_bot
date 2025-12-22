@@ -1,22 +1,47 @@
 from pdf_handler import PDFHandler
 from vector_db import VectorDatabase
+import os
 
-# pdf_path = "./PROPECTUS 2022-23.pdf"
-# # Creating an instance and giving it pdf path
-# pdf_handler = PDFHandler(document_path=pdf_path)
-# # getting the chunks list from the pdf_handler instance
-# documents = pdf_handler.load_and_split()
+def ingest_pdf(pdf_path, vector_db):
+    if not os.path.exists(pdf_path):
+        print(f"Error: File not found: {pdf_path}")
+        return
+        
+    file_name = os.path.basename(pdf_path)
+    
+    # Check if already present
+    if vector_db.is_document_present(file_name):
+        print(f"Skipping {file_name}: Documents already present in RAG system.")
+        return
+    
+    print(f"Extraction and embedding step started for: {file_name}")
+    
+    try:
+        pdf_handler = PDFHandler(document_path=pdf_path)
+        documents = pdf_handler.load_and_split()
+        vector_db.add_documents(documents=documents)
+        print(f"Successfully indexed {file_name}.")
+    except Exception as e:
+        print(f"Error indexing {file_name}: {e}")
 
-
-# # creating instance of vector database
+# Initialize vector database
 vector_db = VectorDatabase()
-# # adding document recived from pdf handler to vector db
-# vector_db.add_documents(documents=documents)
 
-#now searching in vector db
+# List of PDFs to index
+pdfs_to_index = [
+    "./PROPECTUS 2022-23.pdf",
+    "./school_document.pdf"
+]
+
+# Process each PDF
+for pdf in pdfs_to_index:
+    ingest_pdf(pdf, vector_db)
+
+# Now searching in vector db to verify
+print("\nVerifying index with a test query...")
 query = "What are the admission requirements for undergraduate programs at UET?"
 results = vector_db.search(query_text=query, docs_to_search=3)
 
-
-for i in range(len(results)):
-    print(f"Document {i+1}:\n{results[i].page_content}\n")
+for i, doc in enumerate(results):
+    source = doc.metadata.get('source', 'Unknown')
+    print(f"Result {i+1} (Source: {source}):\n{doc.page_content[:200]}...\n")
