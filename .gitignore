@@ -39,7 +39,8 @@ venv.bak/
 .venv/
 .pyenv/
 pip-wheel-metadata/
-
+virtual/
+virtual
 # PyInstaller
 *.manifest
 *.spec

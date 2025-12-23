@@ -1,5 +1,5 @@
 from langchain_openai import ChatOpenAI
-from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
 from dotenv import load_dotenv
 import os
 
@@ -54,10 +54,10 @@ class ChatBot:
         # Add history if provided
         if history:
             for msg in history:
-                if msg["sender"] == "user":
-                    messages.append(HumanMessage(content=msg["message"]))
-                else:
-                    messages.append(HumanMessage(content=f"Assistant: {msg['message']}")) # Or AIMessage if imported
+                if msg.get("sender") == "user":
+                    messages.append(HumanMessage(content=msg.get("message", "")))
+                elif msg.get("sender") == "bot":
+                    messages.append(AIMessage(content=msg.get("message", "")))
 
         # Finally add current user prompt
         messages.append(HumanMessage(content=user_prompt))
