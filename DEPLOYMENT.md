@@ -16,31 +16,54 @@ docker build -t rag-chatbot:v1.0 .
 
 ## Run the Container
 
-### Basic Run (Development)
+### Option 1: Using Your Existing .env File (Recommended)
+If you already have a `.env` file in your project root, you can use it directly:
+
+```bash
+docker run -d \
+  --name rag-chatbot \
+  -p 8000:8000 \
+  --env-file .env \
+  -v $(pwd)/vector_db:/app/vector_db \
+  --restart unless-stopped \
+  rag-chatbot:latest
+```
+
+**Note**: Your `.env` file should contain:
+```env
+OPENAI_API_KEY=sk-your-actual-api-key-here
+MONGODB_URI=mongodb://localhost:27017
+```
+
+### Option 2: Pass Environment Variables Directly
 ```bash
 docker run -d \
   --name rag-chatbot \
   -p 8000:8000 \
   -e OPENAI_API_KEY=your_openai_api_key_here \
   -e MONGODB_URI=mongodb://localhost:27017 \
+  -v $(pwd)/vector_db:/app/vector_db \
+  --restart unless-stopped \
   rag-chatbot:latest
 ```
 
-### Production Run (with Volume Persistence)
+### Option 3: Production Run (with External MongoDB)
 ```bash
 docker run -d \
   --name rag-chatbot \
   -p 8000:8000 \
-  -e OPENAI_API_KEY=your_openai_api_key_here \
+  --env-file .env \
   -e MONGODB_URI=mongodb://your_mongodb_host:27017 \
   -v $(pwd)/vector_db:/app/vector_db \
   --restart unless-stopped \
   rag-chatbot:latest
 ```
 
-### Using Environment File
+### Option 4: Create Separate Docker Environment File
+If you want to keep your local `.env` separate from Docker:
+
 ```bash
-# Create .env.docker file
+# Create .env.docker file (don't commit this to git!)
 cat > .env.docker << EOF
 OPENAI_API_KEY=your_openai_api_key_here
 MONGODB_URI=mongodb://your_mongodb_host:27017
@@ -55,6 +78,8 @@ docker run -d \
   --restart unless-stopped \
   rag-chatbot:latest
 ```
+
+**Security Note**: Make sure `.env.docker` is in your `.gitignore` if you create it!
 
 ## Useful Docker Commands
 
@@ -192,9 +217,8 @@ services:
     container_name: rag-chatbot
     ports:
       - "8000:8000"
-    environment:
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - MONGODB_URI=${MONGODB_URI}
+    env_file:
+      - .env  # Loads variables from your .env file
     volumes:
       - ./vector_db:/app/vector_db
     restart: unless-stopped
@@ -212,4 +236,6 @@ docker-compose up -d
 docker-compose logs -f
 docker-compose down
 ```
+
+**Note**: Docker Compose will automatically load variables from your `.env` file using `env_file`.
 

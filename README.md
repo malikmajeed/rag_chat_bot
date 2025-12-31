@@ -2,6 +2,13 @@
 
 A comprehensive RAG (Retrieval-Augmented Generation) chatbot application built with Python, FastAPI, and Docker. This project serves as an educational resource to understand core technologies including **RAG systems**, **FastAPI**, and **Docker containerization**.
 
+## 📚 Course Information
+
+**Subject**: Computational Intelligence  
+**Semester**: 7th  
+**Project Type**: Semester Project  
+**Lecturer**: [Hamas Ur Rehman](https://github.com/Hamas-ur-Rehman)
+
 ## 📋 Project Overview
 
 This project implements a **Retrieval-Augmented Generation (RAG)** chatbot system designed to answer questions about UET Peshawar admissions. The chatbot is specifically trained on the **UET Peshawar Undergraduate Prospectus 2022-23** and provides accurate answers to students from batch 2022-26 regarding admission requirements, programs, procedures, and university information.
@@ -226,6 +233,15 @@ This project is for educational purposes.
 For questions about UET Peshawar admissions, please contact:
 - **Directorate of Admissions**: admission@uetpeshawar.edu.pk
 - **Website**: www.uetpeshawar.edu.pk
+
+## 🙏 Acknowledgments
+
+This project was developed as part of the **Computational Intelligence** course (7th Semester) at UET Peshawar under the guidance of **Hamas Ur Rehman**.
+
+- **Course**: Computational Intelligence
+- **Semester**: 7th
+- **Project Type**: Semester Project
+- **Instructor**: [Hamas Ur Rehman](https://github.com/Hamas-ur-Rehman) - AI/ML Enthusiast and Lecturer at UET Peshawar
 
 ---
 

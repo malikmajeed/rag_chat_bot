@@ -1,39 +1,48 @@
 # =============================================================================
-# PRODUCTION DOCKERFILE FOR RAG CHATBOT
+# PRODUCTION DOCKERFILE FOR RAG CHATBOT (OPTIMIZED - MULTI-STAGE)
 # =============================================================================
 
-# Use Python 3.11 slim image as base
-FROM python:3.11-slim
+# Stage 1: Build stage - Install dependencies with build tools
+FROM python:3.11-slim as builder
 
-# Set working directory
-WORKDIR /app
+WORKDIR /build
 
 # Install system dependencies required for building Python packages
-# These are needed for packages like sentence-transformers, numpy, etc.
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     gcc \
     g++ \
     && rm -rf /var/lib/apt/lists/*
 
+# Set environment variables for pip
+ENV PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_USER=1
+
+# Copy requirements file
+COPY requirements.txt .
+
+# Install Python dependencies to user directory
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Stage 2: Runtime stage - Final lightweight image
+FROM python:3.11-slim
+
+WORKDIR /app
+
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    PIP_NO_CACHE_DIR=1 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1
+    PATH=/home/appuser/.local/bin:$PATH
 
-# Copy requirements file first (for better layer caching)
-COPY requirements.txt .
+# Create non-root user first
+RUN useradd -m -u 1000 appuser
 
-# Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# Copy only installed packages from builder stage to user's local directory
+COPY --from=builder --chown=appuser:appuser /root/.local /home/appuser/.local
 
 # Copy application code
-COPY . .
-
-# Create non-root user for security
-RUN useradd -m -u 1000 appuser && \
-    chown -R appuser:appuser /app
+COPY --chown=appuser:appuser . .
 
 # Switch to non-root user
 USER appuser
@@ -41,7 +50,7 @@ USER appuser
 # Expose port
 EXPOSE 8000
 
-# Health check (using curl which is available in slim image or wget)
+# Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
     CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')" || exit 1
 
