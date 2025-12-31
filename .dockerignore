@@ -1,0 +1,68 @@
+# Virtual environments
+virtual/
+venv/
+env/
+.venv/
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+
+# Environment files (will be passed as env vars)
+.env
+.env.local
+.env.*.local
+
+# Documentation
+README.md
+*.md
+
+# Logs
+*.log
+logs/
+
+# Test files
+test/
+tests/
+*_test.py
+*_tests.py
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# PDF files (if not needed in image)
+*.pdf
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
